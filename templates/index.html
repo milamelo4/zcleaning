@@ -1,14 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
 <!-- create templates/index.html -->
-    <h1>Hello World</h1>
+    
     <p>This is the templates example</p>
     <!-- <p>{{ test | safe }}</p> Not safe -->
-<h3>Favorite Pizza</h3>
+    <h3>Favorite Pizza</h3>
 
-{% for pizza in favorite_pizza %}
-    <li>{{ pizza }}</li>
-{% endfor %}    
-<div>
-    {% if True %}
-    yay
-    {% endif %}
-</div>
+    {% for pizza in favorite_pizza %}
+        <li>{{ pizza }}</li>
+    {% endfor %}
+{% endblock %}

@@ -1,7 +1,44 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify
+from flask_wtf import FlaskForm
+from wtforms import StringField, SubmitField
+from wtforms.validators import DataRequired
+from flask_sqlalchemy import SQLAlchemy
+from dotenv import load_dotenv
+import os
+import mysql.connector
+
+
+load_dotenv()
 
 # Create a Flask instance   
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'mysecretkey'
+
+# Configure the MySQL database
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Initialize SQLAlchemy
+db = SQLAlchemy(app)
+
+# Define your models here
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    
+def get_db_connection():
+    return mysql.connector.connect(
+        host=os.getenv('DB_HOST'),
+        port=os.getenv('DB_PORT'),
+        user=os.getenv('DB_USER'),
+        password=os.getenv('DB_PASSWORD'),
+        database=os.getenv('DB_NAME')
+    )
+
+# Create a form
+class NameForm(FlaskForm):
+    name = StringField("What is your name?", validators=[DataRequired()])
+    submit = SubmitField("Submit")
 
 # Create a route for the home page
 @app.route("/")
@@ -22,3 +59,18 @@ def user(name):
 def handle_error(e):
     error_code = e.code if hasattr(e, "code") else 500
     return render_template("error.html", error_code=error_code), error_code
+
+@app.route('/test')
+def get_users():
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)  # Use dictionary=True for row dicts
+    cursor.execute("SELECT * FROM client")
+    users = cursor.fetchall()
+    cursor.close()
+    connection.close()
+    return jsonify(users)
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
+

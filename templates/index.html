@@ -1,0 +1,14 @@
+<!-- create templates/index.html -->
+    <h1>Hello World</h1>
+    <p>This is the templates example</p>
+    <!-- <p>{{ test | safe }}</p> Not safe -->
+<h3>Favorite Pizza</h3>
+
+{% for pizza in favorite_pizza %}
+    <li>{{ pizza }}</li>
+{% endfor %}    
+<div>
+    {% if True %}
+    yay
+    {% endif %}
+</div>

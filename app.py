@@ -3,20 +3,18 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
 from flask_sqlalchemy import SQLAlchemy
-from dotenv import load_dotenv
 import os
 import mysql.connector
-
-
-load_dotenv()
+from config import DevelopmentConfig, ProductionConfig
 
 # Create a Flask instance   
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'mysecretkey'
 
-# Configure the MySQL database
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# Load the appropriate configuration based on the environment
+if os.getenv('FLASK_ENV') == 'production':
+    app.config.from_object(ProductionConfig)
+else:
+    app.config.from_object(DevelopmentConfig)
 
 # Initialize SQLAlchemy
 db = SQLAlchemy(app)
@@ -40,6 +38,9 @@ class NameForm(FlaskForm):
     name = StringField("What is your name?", validators=[DataRequired()])
     submit = SubmitField("Submit")
 
+# ####################################################
+# -----------------------Routes-----------------------
+# ####################################################
 # Create a route for the home page
 @app.route("/")
 def index():

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h1>Welcome, {{ user.account_firstname }}!</h1>
+    <p>Your role: {{ user.account_type }}</p>
+
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            Dashboard Options
+        </div>
+        <div class="card-body">
+            {% if data.can_manage_employees %}
+            <p><a href="#" class="btn btn-warning">Manage Employees</a></p>
+            {% endif %}
+            {% if data.can_view_reports %}
+            <p><a href="#" class="btn btn-info">View Reports</a></p>
+            {% endif %}
+            {% if data.can_access_finances %}
+            <p><a href="#" class="btn btn-success">Access Finances</a></p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

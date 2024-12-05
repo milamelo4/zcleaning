@@ -1,0 +1,51 @@
+:root {
+--app-body-color: #111111;
+--app-body-color-rgb: 17,
+17,
+17;
+--app-body-bg: #222222;
+--app-body-bg-rgb: 34,
+34,
+34;
+
+--app-emphasis-color: #333333;
+--app-emphasis-color-rgb: 51,
+51,
+51;
+
+--app-secondary-color: #444444;
+--app-secondary-color-rgb: 68,
+68,
+68;
+--app-secondary-bg: #555555;
+--app-secondary-bg-rgb: 85,
+85,
+85;
+
+--app-heading-color: #666666;
+
+--app-link-color: #0066cc;
+--app-link-hover-color: #005bb5;
+--app-link-color-rgb: 0,
+102,
+204;
+--app-link-hover-color-rgb: 0,
+91,
+181;
+
+--app-code-color: #999999;
+--app-highlight-color: #ffaa00;
+--app-highlight-bg: #ffeecc;
+
+--app-border-color: #cccccc;
+--app-border-color-translucent: rgba(204, 204, 204, 0.5);
+
+--app-form-valid-color: #00cc00;
+--app-form-valid-border-color: #009900;
+--app-form-invalid-color: #cc0000;
+--app-form-invalid-border-color: #990000;
+
+--app-primary-text-emphasis: #123456;
+--app-secondary-text-emphasis: #654321;
+--app-tertiary-text-emphasis: #321654;
+}

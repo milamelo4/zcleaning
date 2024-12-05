@@ -4,7 +4,6 @@ from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
 from flask_sqlalchemy import SQLAlchemy
 import os
-import mysql.connector
 from config import DevelopmentConfig, ProductionConfig
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User
@@ -24,12 +23,12 @@ db.init_app(app)
 
     
 def get_db_connection():
-    return mysql.connector.connect(
+    return psycopg2.connect(
         host=os.getenv('DB_HOST'),
         port=os.getenv('DB_PORT'),
         user=os.getenv('DB_USER'),
         password=os.getenv('DB_PASSWORD'),
-        database=os.getenv('DB_NAME')
+        dbname=os.getenv('DB_NAME')
     )
 
 # ####################################################

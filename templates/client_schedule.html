@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h1>Client Weekly Schedule</h1>
+    <p>Select a day to view the schedule:</p>
+
+    <form method="POST">
+        <div class="form-group">
+            <label for="preferred_day">Preferred Day:</label>
+            <select class="form-control" id="preferred_day"
+                name="preferred_day">
+                <option value="M" {% if selected_day=='M' %}selected{% endif %}>
+                    Monday</option>
+                <option value="TUE" {% if selected_day=='TUE' %}selected{% endif
+                    %}>Tuesday</option>
+                <option value="W" {% if selected_day=='W' %}selected{% endif %}>
+                    Wednesday</option>
+                <option value="TH" {% if selected_day=='TH' %}selected{% endif
+                    %}>Thursday</option>
+                <option value="F" {% if selected_day=='F' %}selected{% endif %}>
+                    Friday</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary mt-2">View
+            Schedule</button>
+    </form>
+
+    {% if schedule %}
+    <h2 class="mt-4">Schedule for {{ selected_day }}</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Client Name</th>
+                <th>Total Hours</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for entry in schedule %}
+            <tr>
+                <td>{{ entry.name }}</td>
+                <td>{{ entry.total_hours }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="mt-4">No data available. Please select a day to view the schedule.
+    </p>
+    {% endif %}
+</div>
+{% endblock %}

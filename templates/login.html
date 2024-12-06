@@ -1,26 +1,30 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="card p-5 m-4 bg-dark text-white w-50 mx-auto">
+<div class="card p-5 m-4 bg-dark text-white mx-auto" style="max-width: 500px;">
     <div class="card-header">
-        <h1>Login</h1>
+        <h1 class="text-center">Login</h1>
     </div>
-    <div class="card-body p-5">
+    <div class="card-body">
         <form class="row g-3" action="{{ url_for('login') }}" method="POST">
-            <div class="col-9">
+            <div class="col-12">
                 <label for="inputEmail4" class="form-label">Email</label>
-                <input type="email" name="username" class="form-control" id="inputEmail4"
-                    placeholder="email@example.com" title="email@example.com">
+                <input type="email" name="username" class="form-control"
+                    id="inputEmail4" placeholder="email@example.com"
+                    title="email@example.com">
             </div>
-            <div class="col-9">
+            <div class="col-12">
                 <label for="inputPassword4" class="form-label">Password</label>
-                <input type="password" name="password" class="form-control" id="inputPassword4">
-            </div><br>
+                <input type="password" name="password" class="form-control"
+                    id="inputPassword4">
+            </div>
             <div class="col-12 d-flex flex-column">
-                <button type="submit" class="btn btn-secondary col-9 mb-3">Sign in</button>
-                <a href="{{ url_for('register') }}" class="btn btn-secondary col-9">Register</a>
-
+                <button type="submit" class="btn btn-secondary w-100 mb-3">Sign
+                    in</button>
+                <a href="{{ url_for('register') }}"
+                    class="btn btn-secondary w-100">Register</a>
             </div>
         </form>
     </div>
 </div>
+
 {% endblock %}

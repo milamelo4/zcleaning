@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h1>View Reports</h1>    
+
+    <!-- Add Date Selection Form -->
+    <form method="POST" action="{{ url_for('view_reports') }}">
+        <div class="mb-3">
+            <label for="week_start_date" class="form-label">Select Week Start
+                Date:</label>
+            <input type="date" class="form-control" id="week_start_date"
+                name="week_start_date" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Fetch Reports</button>
+    </form>
+
+    <!-- Add some spacing -->
+    <hr class="my-4">
+    <p>Below is the data fetched from the reports{% if selected_date %} for the week starting on {{ selected_date }}{% endif %}:</p>
+
+    <!-- Display Report Data -->
+    <table class="table mt-3">
+        <thead>
+            <tr>
+                <th>Employee Name</th>
+                <th>Weekly Payment</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for report in reports %}
+            <tr>
+                <td>{{ report.name }}</td>
+                <td>{{ report.payment }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

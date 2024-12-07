@@ -11,6 +11,10 @@ from functools import wraps
 import psycopg2 # type: ignore
 import hashlib
 from sqlalchemy import text
+from flask_wtf.csrf import CSRFProtect
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField, SubmitField
+from wtforms.validators import DataRequired, Email, EqualTo
 
 
 # Create a Flask instance   
@@ -21,6 +25,9 @@ if os.getenv('FLASK_ENV') == 'production':
     app.config.from_object(ProductionConfig)
 else:
     app.config.from_object(DevelopmentConfig)
+
+# Initialize CSRF protection
+csrf = CSRFProtect(app)
 
 # Initialize SQLAlchemy
 db.init_app(app)
@@ -43,7 +50,7 @@ def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if 'username' not in session:
-            flash("You need to log in first.", "warning")
+            flash("Your session has expired or you need to log in first.", "warning")
             return redirect(url_for('login'))
         return f(*args, **kwargs)
     return decorated_function
@@ -52,9 +59,11 @@ def login_required(f):
 # -----------------------Routes-----------------------
 # ####################################################
 # Home page
-@app.route("/", methods=["GET", "POST"])
+@app.route('/')
 def index():
-    return redirect(url_for("login"))
+    # Check if the user is logged in
+    is_logged_in = 'username' in session
+    return render_template('index.html', is_logged_in=is_logged_in)
 
 # Create a custom error page
 @app.errorhandler(Exception)
@@ -73,49 +82,55 @@ def get_users():
     return jsonify(users)
 
 # Login Page
+class LoginForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    submit = SubmitField('Login')
+# Login Page
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    try:
-        if 'username' in session:
-            return redirect(url_for('dashboard'))
+    form = LoginForm()
 
-        if request.method == "POST":
-            email = request.form.get('username')
-            password = request.form.get('password')
+    if 'username' in session:
+        return redirect(url_for('dashboard'))
 
-            # Query the database for the user
-            user = User.query.filter_by(account_email=email).first()
+    if form.validate_on_submit():  # This also validates CSRF token
+        email = form.username.data
+        password = form.password.data
 
-            if not user or not user.account_password:
-                flash("Invalid username or password", "danger")
-                return redirect(url_for('login'))
+        # Query the database for the user
+        user = User.query.filter_by(account_email=email).first()
 
-            # Hash the entered password using SHA-256 and compare
-            hashed_password = hashlib.sha256(password.encode()).hexdigest()
-            if hashed_password == user.account_password:
-                # Store user info in session
-                session['username'] = user.account_email
-                session['user_id'] = user.account_id
-                return redirect(url_for('dashboard'))
-            else:
-                flash("Invalid username or password", "danger")
+        if not user or hashlib.sha256(password.encode()).hexdigest() != user.account_password:
+            flash("Invalid username or password", "danger")
+            return redirect(url_for('login'))
 
-        return render_template("login.html")
+        session['username'] = user.account_email
+        session['user_id'] = user.account_id
+        session.permanent = True  # Enable session timeout
 
-    except Exception as e:
-        app.logger.error(f"Error in /login route: {e}")
-        return f"Error in /login route: {e}", 500
+        flash("Login successful!", "success")
+        return redirect(url_for('dashboard'))
 
+    return render_template("login.html", form=form)
+
+class RegistrationForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
+    submit = SubmitField('Register')
 
 # Register Page
 @app.route("/register", methods=["GET", "POST"])
 def register():
+    form = RegistrationForm()  # Create an instance of RegistrationForm
+    
     try:
-        if request.method == "POST":
-            firstname = request.form.get('firstname')
-            lastname = request.form.get('lastname')
-            email = request.form.get('email')
-            password = request.form.get('password')
+        if form.validate_on_submit():  # Check if the form is submitted and all validations pass
+            firstname = request.form.get('firstname')  # Assuming firstname is in your template
+            lastname = request.form.get('lastname')    # Assuming lastname is in your template
+            email = form.email.data
+            password = form.password.data
 
             # Check if the email is already registered
             existing_user = User.query.filter_by(account_email=email).first()
@@ -140,7 +155,7 @@ def register():
             flash("Registration successful! You can now log in.", "success")
             return redirect(url_for('login'))
 
-        return render_template("register.html")
+        return render_template("register.html", form=form)
 
     except Exception as e:
         app.logger.error(f"Error in registration: {e}")

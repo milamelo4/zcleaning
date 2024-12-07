@@ -49,3 +49,8 @@
 --app-secondary-text-emphasis: #654321;
 --app-tertiary-text-emphasis: #321654;
 }
+
+.a_link {
+text-decoration: none;
+color: inherit;
+}

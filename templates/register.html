@@ -6,6 +6,7 @@
         </div>
         <div class="card-body p-5">
             <form class="row g-3" action="{{ url_for('register') }}" method="POST">
+                {{ form.csrf_token }}
                 <div class="col-9">
                     <label for="firstname" class="form-label">First Name</label>
                     <input type="text" name="firstname" class="form-control"

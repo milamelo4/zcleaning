@@ -1,12 +1,29 @@
 {% extends "base.html" %}
 {% block content %}
 <!-- create templates/index.html -->
-    
-    <p>This is the templates example</p>
-    <!-- <p>{{ test | safe }}</p> Not safe -->
-    <h3>Favorite Pizza</h3>
-
-    {% for pizza in favorite_pizza %}
-        <li>{{ pizza }}</li>
-    {% endfor %}
+<div class="card mb-3 mx-auto p-3 mt-2" style="max-width: 440px;">
+    <div class="row g-0">
+        <div class="col-mx-4">
+            <img src="{{ url_for('static', filename='images/bee.webp') }}"
+                class="img-fluid rounded-start" alt="Bee on a broomstick">
+        </div>
+        <div class="col-md-15">
+            <div class="card-body text-bg-dark p-3">
+                <h5 class="card-title">Welcome to ZCleaning!</h5>
+                <p class="card-text">
+                    {% if is_logged_in %}
+                    <button type="button" class="btn btn-outline-warning">
+                        <a href="{{ url_for('dashboard') }}" class="a_link">Manage Account</a>
+                    </button>
+                    {% else %}
+                    <p>Please log in to manage your account.</p>
+                    <button type="button" class="btn btn-outline-warning">
+                        <a href="{{ url_for('login') }}" class="a_link">Login</a>
+                    </button>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

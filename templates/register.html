@@ -1,37 +1,37 @@
 {% extends "base.html" %}
 {% block content %}
-    <div class="card p-5 m-4 bg-dark text-white w-50 mx-auto">
+    <div class="card p-3 m-4 bg-dark text-white mx-auto" style="max-width: 500px;">
         <div class="card-header">
             <h1>Register</h1>
         </div>
-        <div class="card-body p-5">
+        <div class="card-body">
             <form class="row g-3" action="{{ url_for('register') }}" method="POST">
                 {{ form.csrf_token }}
-                <div class="col-9">
+                <div class="col-12">
                     <label for="firstname" class="form-label">First Name</label>
                     <input type="text" name="firstname" class="form-control"
                         id="firstname" required>
                 </div>
-                <div class="col-9">
+                <div class="col-12">
                     <label for="lastname" class="form-label">Last Name</label>
                     <input type="text" name="lastname" class="form-control"
                         id="lastname" required>
                 </div>
-                <div class="col-9">
+                <div class="col-12">
                     <label for="email" class="form-label">Email</label>
                     <input type="email" name="email" class="form-control" id="email"
                         required>
                 </div>
-                <div class="col-9">
+                <div class="col-12">
                     <label for="password" class="form-label">Password</label>
                     <input type="password" name="password" class="form-control"
                         id="password" required>
                 </div><br>
                 <div class="col-12 d-flex flex-column">
                     <button type="submit"
-                        class="btn btn-secondary col-9 mb-3">Register</button>
+                        class="btn btn-secondary col-12 mb-3">Register</button>
                     <a href="{{ url_for('login') }}"
-                        class="btn btn-secondary col-9">Back to Login</a>
+                        class="btn btn-secondary col-12">Back to Login</a>
                 </div>
             </form>
         </div>

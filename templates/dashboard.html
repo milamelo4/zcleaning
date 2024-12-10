@@ -5,15 +5,14 @@
     <span id="date" class="float-start"></span>
     <p>Your role: {{ user.account_type }}</p>
     
-
+<!-- 
     <div class="card">
         <div class="card-header bg-primary text-white">
             Dashboard Options
         </div>
         <div class="card-body">
             {% if data.can_manage_employees %}
-            <p><a href="{{ url_for('manage_employees') }}" class="btn btn-warning">Manage
-                    Employees</a></p>
+            <p><a href="{{ url_for('manage_employees') }}" class="btn btn-warning">Manage Employees</a></p>
             {% endif %}
             {% if data.can_view_reports %}
             <p><a href="{{ url_for('view_reports') }}" class="btn btn-info">View Reports</a>
@@ -24,7 +23,47 @@
             {% endif %}
 
         </div>
+    </div> -->
+{% if user.account_type == 'Admin' %}
+<div class="card-body">
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <a href="{{ url_for('manage_employees') }}"
+                class="btn btn-warning w-100"
+                aria-label="Manage Employees">Manage Employees</a>
+        </div>
+        <div class="col-md-4 mb-3">
+            <a href="{{ url_for('view_reports') }}" class="btn btn-info w-100"
+                aria-label="View Reports">View Reports</a>
+        </div>
+        <div class="col-md-4 mb-3">
+            <a href="{{ url_for('add_client') }}" class="btn btn-primary w-100"
+                aria-label="Add Client">Add Client</a>
+        </div>
+        <div class="col-md-4 mb-3">
+            <a href="{{ url_for('search_client') }}" class="btn btn-dark w-100"
+                aria-label="Search Client">Search Client</a>
+        </div>
+        <div class="col-md-4 mb-3">
+            <a href="{{ url_for('client_schedule') }}" class="btn btn-success w-100"
+                aria-label="Search Client">Client Schedule</a>
+        </div>
     </div>
+</div>
+{% else %}
+<div class="card-body">
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <a href="{{ url_for('client_schedule') }}"
+                class="btn btn-success w-100"
+                aria-label="Client Schedule">Client Schedule</a>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+
+    
 </div>
 <script>
     const date = new Date();

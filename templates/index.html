@@ -18,8 +18,10 @@
                     {% else %}
                     <p>Please log in to manage your account.</p>
                     <button type="button" class="btn btn-outline-warning">
-                        <a href="{{ url_for('login') }}" class="a_link">Login</a>
+                        <a href="{{ url_for('login') }}" class="a_link" title="Login">Login</a>
                     </button>
+                    
+                    <p style="margin-top: 10px;"><small>Don't have an account? <a href="{{ url_for('register') }}" class="r_link" title="Register">Register</a></small></p>
                     {% endif %}
                 </p>
             </div>

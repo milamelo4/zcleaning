@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block content %}
+<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb" class="mt-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}" class="curr_page">Dashboard</a>></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('manage_employees') }}">Manage Employees</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('view_reports') }}">View Reports</a></li>       
+        <li class="breadcrumb-item"><a href="{{ url_for('search_client') }}">Search Client</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('client_schedule') }}">Client Schedule</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Current Page</li>
+    </ol>
+</nav>
+
+<div class="card p-3 m-4 bg-dark text-white mx-auto" style="max-width: 500px;">
+        <div class="card-header">
+            <h1>Add New Client</h1>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('add_client') }}" class="row g-3">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="col-12">
+                    <label for="first_name" class="form-label">First Name</label>
+                    <input type="text" class="form-control" id="first_name"
+                        name="first_name" required>
+                </div>
+                <div class="col-12">
+                    <label for="last_name" class="form-label">Last Name</label>
+                    <input type="text" class="form-control" id="last_name"
+                        name="last_name" required>
+                </div>
+                <div class="col-12">
+                    <label for="phone_number" class="form-label">Phone Number</label>
+                    <input type="text" class="form-control" id="phone_number"
+                        name="phone_number" required>
+                </div>
+                <div class="col-12">
+                    <label for="hired_date" class="form-label">Hired Date</label>
+                    <input type="date" class="form-control" id="hired_date"
+                        name="hired_date">
+                </div>
+                <div class="col-12">
+                    <label for="service_hours" class="form-label">Service Hours</label>
+                    <input type="number" class="form-control" id="service_hours"
+                        name="service_hours">
+                </div>
+                <div class="col-12">
+                    <label for="preferred_day" class="form-label">Preferred Day</label>
+                    <select class="form-select" id="preferred_day" name="preferred_day"
+                        required>
+                        <option value="M">Monday</option>
+                        <option value="TUE">Tuesday</option>
+                        <option value="WED">Wednesday</option>
+                        <option value="THU">Thursday</option>
+                        <option value="F">Friday</option>
+                        <option value="NOTSET">Not Set</option>
+                    </select>
+                </div>
+                <div class="col-12">
+                    <label for="service_type_id" class="form-label">Service Type
+                        ID</label>
+                    <input type="number" class="form-control" id="service_type_id"
+                        name="service_type_id">
+                </div>
+                <div class="col-12">
+                    <label for="is_active" class="form-label">Status</label>
+                    <select class="form-select" id="is_active" name="is_active">
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Add Client</button>
+            </form>
+        </div>
+    
+</div>
+{% endblock %}

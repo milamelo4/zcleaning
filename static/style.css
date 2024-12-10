@@ -1,5 +1,5 @@
 :root {
---app-body-color: #111111;
+/* --app-body-color: #111111;
 --app-body-color-rgb: 17,
 17,
 17;
@@ -47,10 +47,21 @@
 
 --app-primary-text-emphasis: #123456;
 --app-secondary-text-emphasis: #654321;
---app-tertiary-text-emphasis: #321654;
+--app-tertiary-text-emphasis: #321654; */
+--primary: #f5ebe0;
+    --secondary: #d5bdaf;
+    --accent1: #d6ccc2;
+    --accent2: #edede9;
 }
 
 .a_link {
 text-decoration: none;
 color: inherit;
+}
+.r_link{
+    color: #ffc107;;
+}
+
+.curr_page {
+    margin-right: 10px;
 }

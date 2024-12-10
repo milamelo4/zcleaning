@@ -227,7 +227,7 @@ def manage_employees():
     FROM zcleaning.employee
 """))
         # Debug: Print employees to the console
-        print(f"Fetched employees: {result}")
+        #print(f"Fetched employees: {result}")
 
         return render_template("manage_employees.html", employees=result)
     except Exception as e:
@@ -309,6 +309,77 @@ def access_finances():
     # Logic to fetch and display financial data (to be added later)
     return render_template('access_finances.html')
 
+@app.route("/search_client", methods=["GET", "POST"])
+@login_required
+def search_client():
+    try:
+        user = User.query.filter_by(account_email=session['username']).first()
+        if user.account_type != 'Admin':
+            flash("You do not have permission to access this page.", "danger")
+            return redirect(url_for('dashboard'))
+
+        search_results = None
+        if request.method == "POST":
+            client_name = request.form.get("client_name")
+
+            # Perform the database query
+            search_results = db.session.execute(text("""
+                    SELECT * FROM zcleaning.client WHERE last_name ILIKE :client_name
+"""), {'client_name': f'%{client_name}%'}).fetchall()
+
+        return render_template("search_client.html", search_results=search_results)
+
+    except Exception as e:
+        app.logger.error(f"Error in /search_client route: {e}")
+        return f"Error in /search_client route: {e}", 500
+
+@app.route("/add-client", methods=["GET", "POST"])
+@login_required
+def add_client():
+    try:
+        user = User.query.filter_by(account_email=session['username']).first()
+        if user.account_type != 'Admin':
+            flash("You do not have permission to access this page.", "danger")
+            return redirect(url_for('dashboard'))
+
+        if request.method == "POST":
+            # Retrieve form data
+            first_name = request.form.get("first_name")
+            last_name = request.form.get("last_name")
+            phone_number = request.form.get("phone_number")
+            hired_date = request.form.get("hired_date")
+            service_hours = request.form.get("service_hours", 0)  # Default to 0
+            preferred_day = request.form.get("preferred_day").upper()
+            service_type_id = request.form.get("service_type_id", 1)  # Default to 1
+            is_active = request.form.get("is_active", "active")  # Default to 'active'
+
+            # Insert the new client into the database
+            db.session.execute(text(f"""
+                INSERT INTO zcleaning.client (first_name, last_name, phone_number, hired_date,
+                service_hours, preferred_day, service_type_id, is_active)
+                VALUES (:first_name, :last_name, :phone_number, :hired_date,
+                :service_hours, :preferred_day, :service_type_id, :is_active)
+            """), {
+                "first_name": first_name,
+                "last_name": last_name,
+                "phone_number": phone_number,
+                "hired_date": hired_date,
+                "service_hours": service_hours,
+                "preferred_day": preferred_day,
+                "service_type_id": service_type_id,
+                "is_active": is_active
+            })
+            db.session.commit()
+
+            flash("Client added successfully!", "success")
+            return redirect(url_for('dashboard'))
+
+        return render_template("add_client.html")
+
+    except Exception as e:
+        app.logger.error(f"Error in /add-client route: {e}")
+        flash("An error occurred. Please try again.", "danger")
+        return redirect(url_for('dashboard'))
 
 
     

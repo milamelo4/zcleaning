@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="mt-4">
+    <h1>My Personal Information</h1>
+    <div class="card shadow-sm">
+        <div class="card-body lt-color">
+            <h5 class="card-title">{{ user.firstname }} {{ user.lastname }}</h5>
+            <p class="card-text"><strong>Email:</strong> {{ user.email }}</p>
+            <p class="card-text"><strong>Phone Number:</strong> {{
+                user.phone_number }}</p>
+            <p class="card-text"><strong>Date of Birth:</strong> {{ user.dob }}
+            </p>
+            <p class="card-text"><strong>Address:</strong> {{ user.address }}
+            </p>
+            <p class="card-text"><strong>Hire Date:</strong> {{ user.hire_date
+                }}</p>
+            <p class="card-text"><strong>Employment Status:</strong> {{
+                user.employment_status }}</p>
+            <p class="card-text"><strong>Hourly Pay Rate:</strong> ${{
+                user.hourly_pay_rate }}</p>
+        </div>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary mt-3">Back
+            to Dashboard</a>
+    </div>
+</div>
+{% endblock %}

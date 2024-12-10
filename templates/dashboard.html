@@ -1,29 +1,16 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="container mt-5">
+    {% if user %}
     <h1>Welcome, {{ user.account_firstname }}!</h1>
     <span id="date" class="float-start"></span>
     <p>Your role: {{ user.account_type }}</p>
-    
-<!-- 
-    <div class="card">
-        <div class="card-header bg-primary text-white">
-            Dashboard Options
-        </div>
-        <div class="card-body">
-            {% if data.can_manage_employees %}
-            <p><a href="{{ url_for('manage_employees') }}" class="btn btn-warning">Manage Employees</a></p>
-            {% endif %}
-            {% if data.can_view_reports %}
-            <p><a href="{{ url_for('view_reports') }}" class="btn btn-info">View Reports</a>
-            </p>
-            {% endif %}
-            {% if data.can_access_finances %}
-            <p><a href="{{ url_for('client_schedule') }}" class="btn btn-success">Client Schedule</a></p>
-            {% endif %}
+    {% else %}
+    <p>Error: User data not available.</p>
+    {% endif %}
+</div>
 
-        </div>
-    </div> -->
+
 {% if user.account_type == 'Admin' %}
 <div class="card-body">
     <div class="row">
@@ -51,18 +38,22 @@
     </div>
 </div>
 {% else %}
-<div class="card-body">
-    <div class="row">
-        <div class="col-md-4 mb-3">
-            <a href="{{ url_for('client_schedule') }}"
-                class="btn btn-success w-100"
-                aria-label="Client Schedule">Client Schedule</a>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <a href="{{ url_for('client_schedule') }}" class="btn btn-success w-100"
+                    aria-label="Search Client">Client Schedule</a>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <a href="{{ url_for('my_personal_info') }}" class="btn btn-primary w-100"
+                    aria-label="Search Client">Personal Info</a>
+            </div>
         </div>
     </div>
-</div>
 {% endif %}
 
-
+{% endblock %}
     
 </div>
 <script>
@@ -72,4 +63,3 @@
     document.getElementById('date').textContent = formattedDate;
 
 </script>
-{% endblock %}

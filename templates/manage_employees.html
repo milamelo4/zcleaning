@@ -10,42 +10,39 @@
         
         <li class="breadcrumb-item"><a href="{{ url_for('search_client') }}">Search Client</a></li>
         <li class="breadcrumb-item"><a href="{{ url_for('client_schedule') }}">Client Schedule</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Current Page</li>
+        <li class="breadcrumb-item active" aria-current="page">Manage Employees</li>
     </ol>
 </nav>
 
-<div class="card shadow-sm mt-4">
+<div class="mt-4">
     <h4 class="m-3">Manage Employees</h4>
-    <div class="card-body">
-        <div class="table-responsive-sm">
-            <table class="table table-striped table-bordered table-hover align-middle">
-                <thead class="table-dark">
-                    <tr>
-                        <th scope="col">First Name</th>
-                        <th scope="col">Last Name</th>
-                        <th scope="col">Hourly Pay Rate</th>
-                        <th scope="col">Hire Date</th>
-                        <th scope="col">Employment Status</th>
-                        <th scope="col">Actions</th>
-                    </tr>
-                </thead>
-                <tbody class="table-group-divider">
-                    {% for employee in employees %}
-                    <tr>
-                        <td>{{ employee.first_name }}</td>
-                        <td>{{ employee.last_name }}</td>
-                        <td>{{ employee.hourly_pay_rate }}</td>
-                        <td>{{ employee.hire_date }}</td>
-                        <td>{{ employee.employment_status }}</td>
-                        <td>
-                            <a href="#" class="btn btn-sm btn-info">Edit</a>
-                            <a href="#" class="btn btn-sm btn-danger">Delete</a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    <div class="d-grid gap-3"
+        style="grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));">
+        {% for employee in employees %}
+        <div class="card shadow-sm">
+            <div class="card-body lt-color">
+                <h5 class="card-title">{{ employee.first_name }} {{
+                    employee.last_name }}</h5>
+                <hr>
+                <p class="card-text"><strong>Hire Date:</strong> {{
+                    employee.hire_date }}</p>
+                <p class="card-text"><strong>Hourly Pay Rate:</strong> ${{
+                    employee.hourly_pay_rate }}</p>
+                <p class="card-text"><strong>Phone Number:</strong> {{
+                    employee.formatted_phone_number }}</p>
+                <p class="card-text"><strong>Address:</strong> {{
+                    employee.street }}</p>
+                <p class="card-text"><strong>Employment Status:</strong> {{
+                    employee.employment_status }}</p>
+                <p>
+                    <a href="#" class="btn btn-sm btn-info">Edit</a>
+                    <a href="#" class="btn btn-sm btn-danger">Delete</a>
+                </p>
+            </div>
         </div>
+        {% endfor %}
     </div>
 </div>
+
+
 {% endblock %}

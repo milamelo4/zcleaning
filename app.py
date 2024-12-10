@@ -124,9 +124,13 @@ class RegistrationForm(FlaskForm):
 @app.route("/register", methods=["GET", "POST"])
 def register():
     form = RegistrationForm()  # Create an instance of RegistrationForm
-    
     try:
+        if not form.validate_on_submit():
+            app.logger.debug("Form validation failed.")
+            app.logger.debug(f"Errors: {form.errors}")
+
         if form.validate_on_submit():  # Check if the form is submitted and all validations pass
+            app.logger.debug("Form validated successfully.")
             firstname = request.form.get('firstname')  # Assuming firstname is in your template
             lastname = request.form.get('lastname')    # Assuming lastname is in your template
             email = form.email.data
@@ -135,12 +139,13 @@ def register():
             # Check if the email is already registered
             existing_user = User.query.filter_by(account_email=email).first()
             if existing_user:
+                app.logger.debug("Email already registered.")
                 flash("Email already registered. Please log in.", "warning")
                 return redirect(url_for('register'))
 
             # Hash the password for security
             hashed_password = hashlib.sha256(password.encode()).hexdigest()
-
+            app.logger.debug("Password hashed successfully.")
             # Create a new user record
             new_user = User(
                 account_firstname=firstname,
@@ -175,36 +180,42 @@ def logout():
 @app.route("/dashboard")
 @login_required
 def dashboard():
+    app.logger.debug("Accessing dashboard route")
+    print("Accessing dashboard route")
+
     if 'username' not in session:
+        app.logger.debug("No username in session")
         flash("You need to log in first.", "warning")
         return redirect(url_for('login'))
 
-    # Retrieve user information from the database
     user = User.query.filter_by(account_email=session['username']).first()
-
     if not user:
+        app.logger.debug("User not found in database")
         flash("User not found.", "danger")
         return redirect(url_for('login'))
 
-    # Logic for admin and employee
+    app.logger.debug(f"User found: {user.account_email}, Role: {user.account_type}")
+
     if user.account_type == 'Admin':
-        # Pull data to display admin privileges
         data = {
             "can_manage_employees": True,
             "can_view_reports": True,
             "can_access_finances": True
         }
     elif user.account_type == 'Employee':
-        # Pull limited employee privileges
         data = {
             "can_manage_employees": False,
             "can_view_reports": True,
             "can_access_finances": False
         }
     else:
+        app.logger.debug("Unauthorized user role")
         flash("Unauthorized access.", "danger")
         return redirect(url_for('login'))
+
+    app.logger.debug(f"Data passed to template: user={user}, data={data}")
     return render_template("dashboard.html", user=user, data=data)
+
 
 # manage_employees  
 @app.route("/manage-employees")
@@ -223,7 +234,7 @@ def manage_employees():
 
         # Fetch employee data
         result = db.session.execute(text("""
-    SELECT first_name, last_name, hourly_pay_rate, hire_date, employment_status 
+    SELECT first_name, last_name, hourly_pay_rate, hire_date, employment_status, CONCAT(SUBSTRING(phone_number, 1, 3), '-', SUBSTRING(phone_number, 4, 3), '-', SUBSTRING(phone_number, 7, 4)) AS formatted_phone_number,  Concat(street, ', ', city) AS street
     FROM zcleaning.employee
 """))
         # Debug: Print employees to the console
@@ -272,9 +283,10 @@ def view_reports():
 @login_required
 def client_schedule():
     try:
-        # Ensure only Admins can access
+        # Check the logged-in user's role
         user = User.query.filter_by(account_email=session['username']).first()
-        if user.account_type != 'Admin':
+
+        if user.account_type not in ['Admin', 'Employee']:
             flash("You do not have permission to access this page.", "danger")
             return redirect(url_for('dashboard'))
 
@@ -282,6 +294,7 @@ def client_schedule():
         if request.method == "POST":
             selected_day = request.form.get("preferred_day")
 
+        # Query to fetch client schedule data
         result = db.session.execute(text("""
         SELECT 
             CASE
@@ -293,15 +306,16 @@ def client_schedule():
         WHERE c.preferred_day = :preferred_day
             AND c.is_active = 'active'
             AND c.service_type_id BETWEEN 1 AND 3
-        GROUP BY GROUPING SETS ((c.first_name, c.last_name, c.preferred_day), ()) order by total_hours asc;
+        GROUP BY GROUPING SETS ((c.first_name, c.last_name, c.preferred_day), ()) 
+        ORDER BY total_hours ASC;
         """), {'preferred_day': selected_day}).fetchall()
 
         return render_template("client_schedule.html", schedule=result, selected_day=selected_day)
 
     except Exception as e:
         app.logger.error(f"Error in /client-schedule route: {e}")
-        return f"Error in /client-schedule route: {e}", 500
-
+        flash("An error occurred while accessing the schedule.", "danger")
+        return redirect(url_for('dashboard'))
 
 
 @app.route('/access-finances')
@@ -324,8 +338,22 @@ def search_client():
 
             # Perform the database query
             search_results = db.session.execute(text("""
-                    SELECT * FROM zcleaning.client WHERE last_name ILIKE :client_name
+        SELECT 
+        CONCAT(c.first_name, ' ', c.last_name) AS full_name, 
+        CONCAT(SUBSTRING(c.phone_number, 1, 3), '-', SUBSTRING(c.phone_number, 4, 3), '-', SUBSTRING(c.phone_number, 7, 4)) AS formatted_phone_number, 
+        c.hired_date, 
+        c.service_hours, 
+        c.preferred_day, 
+        CONCAT(a.street, ', ', a.city) AS full_address,
+        g.garage_code AS garage_code
+    FROM zcleaning.client c
+    INNER JOIN zcleaning.address a 
+        ON c.client_id = a.client_id
+    INNER JOIN zcleaning.garage_code g
+        ON c.client_id = g.client_id
+    WHERE c.last_name ILIKE :client_name
 """), {'client_name': f'%{client_name}%'}).fetchall()
+
 
         return render_template("search_client.html", search_results=search_results)
 
@@ -380,6 +408,80 @@ def add_client():
         app.logger.error(f"Error in /add-client route: {e}")
         flash("An error occurred. Please try again.", "danger")
         return redirect(url_for('dashboard'))
+
+@app.route("/my-personal-info")
+@login_required
+def my_personal_info():
+    try:
+        # Fetch user details based on session
+        user = User.query.filter_by(account_id=session['user_id']).first()
+        if not user:
+            flash("User not found.", "danger")
+            return redirect(url_for('dashboard'))
+
+        app.logger.debug(f"Session user_id: {session['user_id']}")
+        app.logger.debug(f"User details: {user}")
+
+        # If the user is an admin, skip the employee query
+        if user.account_type == 'Admin':
+            user_data = {
+                "firstname": user.account_firstname,
+                "lastname": user.account_lastname,
+                "email": user.account_email,
+            }
+            return render_template("my_personal_info.html", user=user_data)
+
+        # Get employee_id from the account table
+        employee_id = user.employee_id  # Ensure this is correctly populated in your account table
+        if not employee_id:
+            flash("Employee details not found.", "danger")
+            return redirect(url_for('dashboard'))
+
+        app.logger.debug(f"Employee ID for query: {employee_id}")
+
+        # Query the employee table using the correct employee_id
+        employee_data = db.session.execute(text("""
+            SELECT 
+                CONCAT(SUBSTRING(phone_number, 1, 3), '-', SUBSTRING(phone_number, 4, 3), '-', SUBSTRING(phone_number, 7, 4)) AS phone_number,
+                dob,
+                CONCAT(street, ', ', city) AS address,
+                hire_date,
+                employment_status,
+                hourly_pay_rate
+            FROM zcleaning.employee
+            WHERE employee_id = :employee_id
+        """), {'employee_id': employee_id}).fetchone()
+
+        app.logger.debug(f"Employee data fetched: {employee_data}")
+
+        if not employee_data:
+            flash("Could not retrieve employee details.", "danger")
+            return redirect(url_for('dashboard'))
+
+        # Combine user and employee data
+        user_data = {
+            "firstname": user.account_firstname,
+            "lastname": user.account_lastname,
+            "email": user.account_email,
+            "phone_number": employee_data.phone_number,
+            "dob": employee_data.dob,
+            "address": employee_data.address,
+            "hire_date": employee_data.hire_date,
+            "employment_status": employee_data.employment_status,
+            "hourly_pay_rate": employee_data.hourly_pay_rate
+        }
+
+        return render_template("my_personal_info.html", user=user_data)
+
+    except Exception as e:
+        app.logger.error(f"Error in /my-personal-info route: {e}")
+        flash("An error occurred while retrieving your information.", "danger")
+        return redirect(url_for('dashboard'))
+
+
+
+
+
 
 
     
